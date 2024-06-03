@@ -39,7 +39,7 @@ jobs:
           cp generate.bat generate.sh meson.build ${{ matrix.release_name }}
 
       - name: Zip
-        run: tar -zcvf glad-meson-patch-${{ github.ref_name }}.tar.gz ${{ matrix.release_name }}/
+        run: tar -zcvf glad-meson-patch-${{ matrix.release_name }}.tar.gz ${{ matrix.release_name }}/
 
       - name: upload release asset
         uses: actions/upload-release-asset@v1.0.1
