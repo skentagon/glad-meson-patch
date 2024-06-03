@@ -10,7 +10,7 @@ jobs:
     name: create release
     runs-on: ubuntu-latest
     outputs:
-      value: ${{ steps.create_release.outputs.value }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: create release
         id: create_release
@@ -32,7 +32,11 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: Prepare distridution
-        run: mkdir -p ${{ matrix.release_name }} && cp generate.bat generate.sh LICENSE.build meson.build README.build.md ${{ matrix.release_name }}
+        run: |
+          mkdir -p ${{ matrix.release_name }} |
+          cp README.md ${{ matrix.release_name }}/README.build.md
+          cp LICENSE ${{ matrix.release_name }}/LICENSE.build
+          cp generate.bat generate.sh meson.build ${{ matrix.release_name }}
 
       - name: Zip
         run: tar -zcvf glad-meson-patch-${{ github.ref_name }}.tar.gz ${{ matrix.release_name }}/
