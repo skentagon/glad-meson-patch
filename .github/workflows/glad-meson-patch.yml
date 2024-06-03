@@ -1,0 +1,48 @@
+
+on:
+  push:
+    branches: ["main"]
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  create-release:
+    name: create release
+    runs-on: ubuntu-latest
+    outputs:
+      value: ${{ steps.create_release.outputs.value }}
+    steps:
+      - name: create release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref_name }}
+
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    needs: create-release
+    strategy:
+      matrix:
+        release_name: [glad-2.0.6]
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Prepare distridution
+        run: mkdir -p ${{ matrix.release_name }} && cp generate.bat generate.sh LICENSE.build meson.build README.build.md ${{ matrix.release_name }}
+
+      - name: Zip
+        run: tar -zcvf glad-meson-patch-${{ github.ref_name }}.tar.gz ${{ matrix.release_name }}/
+
+      - name: upload release asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./glad-meson-patch-${{ matrix.release_name }}.tar.gz
+          asset_name: glad-meson-patch-${{ matrix.release_name }}.tar.gz
+          asset_content_type: application/gzip
