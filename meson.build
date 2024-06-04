@@ -19,5 +19,9 @@ endif
 
 glad_dep = declare_dependency(
   include_directories: include_directories('glad.build/include'),
-  link_with: static_library('glad-lib', 'glad.build/src/gl.c'),
+  link_with: static_library(
+    'glad-lib',
+    'glad.build/src/gl.c',
+    include_directories: include_directories('glad.build/include'),
+  ),
 )
