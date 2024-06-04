@@ -5,34 +5,48 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
-  jobs:
-    release:
-      name: release
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v1
+jobs:
+  create-release:
+    name: create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: create release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref_name }}
 
-        - name: Prepare distridution
-          run: mkdir -p dist && cp generate.bat generate.sh LICENSE.build meson_options.txt meson.build README.build.md dist
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    needs: create-release
+    strategy:
+      matrix:
+        release_name: [glad-2.0.6]
+    steps:
+      - uses: actions/checkout@v1
 
-        - name: Zip
-          run: tar -zcvf glad-meson-patch-${{ github.ref }}.tar.gz dist/
+      - name: Prepare distridution
+        run: |
+          mkdir -p ${{ matrix.release_name }} |
+          cp README.md ${{ matrix.release_name }}/README.build.md
+          cp LICENSE ${{ matrix.release_name }}/LICENSE.build
+          cp generate.bat generate.sh meson.build ${{ matrix.release_name }}
 
-        - name: create release
-          id: create_release
-          uses: actions/create-release@v1.0.0
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: ${{ github.ref }}
-            release_name: Release ${{ github.ref }}
-        
-        - name: upload release asset
-          uses: actions/upload-release-asset@v1.0.1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./glad-meson-patch-${{ github.ref }}.tar.gz
-            asset_name: glad-meson-patch-${{ github.ref }}.tar.gz
-            asset_content_type: application/gzip
+      - name: Zip
+        run: tar -zcvf glad-meson-patch-${{ matrix.release_name }}.tar.gz ${{ matrix.release_name }}/
+
+      - name: upload release asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./glad-meson-patch-${{ matrix.release_name }}.tar.gz
+          asset_name: glad-meson-patch-${{ matrix.release_name }}.tar.gz
+          asset_content_type: application/gzip
