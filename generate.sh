@@ -1,10 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+{
+  python3 -m venv .venv
+  source .venv/bin/activate
+  pip install -r requirements.txt
 
-python setup.py install
-python -m glad --api gl:core=4.6 --out-path glad.build c
+  python setup.py install
+  python -m glad $1 --out-path glad.build c
 
-deactivate
+  deactivate
+
+} &> generate-$(date +'%Y%m%d%H%M%S').log

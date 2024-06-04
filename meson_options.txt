@@ -1,5 +1,10 @@
 
 option('api',
-        type: 'string'
-        value: 'gl:core=4.6'
+        type: 'string',
+        value: 'gl:core=4.6',
         description: 'api')
+
+option('extensions',
+        type: 'array',
+        value: [],
+        description: 'extensions')
