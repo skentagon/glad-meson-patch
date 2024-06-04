@@ -1,9 +1,13 @@
+@echo off
 
-python3 -m venv .venv
-.\.venv\Scripts\activate
-pip install -r requirements.txt
+>generate.log {
+  python3 -m venv .venv
+  .\.venv\Scripts\activate
+  pip install -r requirements.txt
 
-python setup.py install
-python -m glad --api gl:core=4.6 --out-path glad.build c
+  python setup.py install
+  python -m glad %* --out-path glad.build c
 
-deactivate
+  deactivate
+}
+

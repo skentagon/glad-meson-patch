@@ -7,12 +7,20 @@ project('glad','c',
   license: 'MIT'
 )
 
+opt_api = get_option('api')
+arg_str = '--api=' + opt_api
+
+opt_ext = get_option('extensions')
+if opt_ext.length() > 0
+  arg_str = arg_str + ' --extensions=' + ','.join(opt_ext)
+endif
 
 if host_machine.system() == 'windows'
-  res = run_command('generate.bat', check: false)
+  generate_script = 'generate.bat'
 else
-  res = run_command('generate.sh', check: false)
+  generate_script = 'generate.sh'
 endif
+res = run_command(generate_script, arg_str, check: false)
 if res.returncode() != 0
   error('failed to generate glad sources.')
 endif
