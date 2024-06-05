@@ -1,0 +1,11 @@
+[wrap-file]
+directory = glad-2.0.6
+source_url = https://github.com/Dav1dde/glad/archive/refs/tags/v2.0.6.tar.gz
+source_filename = glad-2.0.6.tar.gz
+source_hash = 61a70234dc7da467cceb07fcdd6dec1213d6143a1b6b19ccc5d7b64cc247ea47
+patch_url = 
+patch_filename = glad-2.0.6-patch.tar.gz
+patch_hash = 
+
+[provide]
+glad = glad_dep
