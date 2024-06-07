@@ -8,3 +8,38 @@ option('extensions',
         type: 'array',
         value: [],
         description: 'extensions')
+
+option('ext_option',
+        type: 'string',
+        value: '',
+        description: 'another options for glad')
+
+option('alias',
+        type: 'boolean',
+        value: false,
+        description: 'enables function pointer aliasing?')
+
+option('header_only',
+        type: 'boolean',
+        value: false,
+        description: 'generates a header only version of glad?')
+
+option('loader',
+        type: 'boolean',
+        value: false,
+        description: 'includes internal loaders for APIs?')
+
+option('mx',
+        type: 'boolean',
+        value: false,
+        description: 'enables support for multiple GL contexts?')
+
+option('on_demand',
+        type: 'boolean',
+        value: false,
+        description: 'On-demand function pointer loading')
+
+option('ext_c_option',
+        type: 'string',
+        value: '',
+        description: 'another options for glad c generator')
