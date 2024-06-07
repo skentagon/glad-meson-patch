@@ -1,6 +1,8 @@
 
 on:
   push:
+    branches:
+      - 'dev-test-release'
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
@@ -18,6 +20,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
+          draft: ${{ github.ref != 'refs/heads/main' }}
           release_name: Release ${{ github.ref_name }}
 
   release:
@@ -32,15 +35,14 @@ jobs:
 
       - name: Prepare distridution
         run: |
-          mkdir -p ${{ matrix.release_name }} |
-          cp README.md ${{ matrix.release_name }}/README.build.md
-          cp LICENSE ${{ matrix.release_name }}/LICENSE.build
-          cp generate.bat generate.sh meson.build ${{ matrix.release_name }}
+          mkdir -p ${{ matrix.release_name }}
+          cp generate.bat generate.sh meson_options.txt meson.build ${{ matrix.release_name }}
 
       - name: Zip
         run: tar -zcvf glad-meson-patch-${{ matrix.release_name }}.tar.gz ${{ matrix.release_name }}/
 
       - name: upload release asset
+        id: upload_release_asset
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,3 +51,17 @@ jobs:
           asset_path: ./glad-meson-patch-${{ matrix.release_name }}.tar.gz
           asset_name: glad-meson-patch-${{ matrix.release_name }}.tar.gz
           asset_content_type: application/gzip
+
+      - name: create glad.wrap
+        run: |
+          sed -e "s|patch_url =|patch_url = ${{ steps.upload_release_asset.outputs.browser_download_url }}|; s|patch_hash = |patch_hash = $(shasum -a 256 glad-meson-patch-${{ matrix.release_name }}.tar.gz | cut -d ' ' -f 1)|" glad.wrap.template > glad.wrap
+      
+      - name: upload glad.warp
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./glad.wrap
+          asset_name: glad.wrap
+          asset_content_type: text/plain

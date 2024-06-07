@@ -6,7 +6,7 @@
   pip install -r requirements.txt
 
   python setup.py install
-  python -m glad $1 --out-path glad.build c
+  python -m glad $1
 
   deactivate
 
