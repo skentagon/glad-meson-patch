@@ -1,10 +1,8 @@
-@echo off
+@REM @echo off
 
-python -m venv .venv
-.\.venv\Scripts\activate
-pip install setuptools -r requirements.txt
+if exist .venv/Scripts/python.exe python (echo "" > generate.log;) else (-m venv .venv > generate.log;)
 
-python setup.py install
-python -m glad %*
+pip install setuptools -r requirements.txt >> generate.log
+python setup.py install >> generate.log
 
-.\.venv\Scripts\deactivate
+python -m glad %* >> generate.log

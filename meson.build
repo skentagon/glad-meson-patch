@@ -9,53 +9,57 @@ project('glad','c',
 
 # add options for glad module
 opt_api = get_option('api')
-arg_str = '--api=' + opt_api
+arg_list = ['--api=' + opt_api]
 
 opt_ext = get_option('extensions')
 if opt_ext.length() > 0
-  arg_str = arg_str + ' --extensions=' + ','.join(opt_ext)
+  arg_list += '--extensions=' + ','.join(opt_ext)
 endif
 
-arg_str = arg_str + get_option('ext_option')
+if get_option('ext_option') != ''
+  arg_list += get_option('ext_option')
+endif
 
-arg_str = arg_str + ' --out-path glad.build c'
+arg_list += ['--out-path', 'glad.build', 'c']
 
 
 # add options for each language generator
 if get_option('alias')
-  arg_str = arg_str + ' --alias'
+  arg_list += '--alias'
 endif
 
 if get_option('debug')
-  arg_str = arg_str + ' --debug'
+  arg_list += '--debug'
 endif
 
 if get_option('header_only')
-  arg_str = arg_str + ' --header-only'
+  arg_list += '--header-only'
 endif
 
 if get_option('loader')
-  arg_str = arg_str + ' --loader'
+  arg_list += '--loader'
 endif
 
 if get_option('mx')
-  arg_str = arg_str + ' --mx'
+  arg_list += '--mx'
 endif
 
 if get_option('on_demand')
-  arg_str = arg_str + ' --on-demand'
+  arg_list += ' --on-demand'
 endif
 
-arg_str = arg_str + get_option('ext_c_option')
+if get_option('ext_c_option') != ''
+  arg_list += get_option('ext_c_option')
+endif
 
-
+# message(arg_str)
 
 if host_machine.system() == 'windows'
   generate_script = 'generate.bat'
 else
   generate_script = 'generate.sh'
 endif
-res = run_command(generate_script, arg_str, check: false)
+res = run_command(generate_script, arg_list, check: false)
 if res.returncode() != 0
   error('failed to generate glad sources.')
 endif
