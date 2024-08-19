@@ -36,6 +36,7 @@ These options are passed to glad python script.
 | --- | --- | --- | --- |
 | api | string | "gl:core=4.6" |  |
 | extensions | array | [] | all possible extensions are included when empty list is passed |
+| extensions | array | [] | all possible extensions are included when empty list is passed |
 | ext_options | string | "" | |
 
 
